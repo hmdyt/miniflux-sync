@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"slices"
 
 	"github.com/revett/miniflux-sync/log"
 )
@@ -12,10 +13,8 @@ import (
 func ValidateFileExtension(ctx context.Context, s string, allowedExts []string) error {
 	ext := filepath.Ext(s)
 
-	for _, allowedExt := range allowedExts {
-		if ext == allowedExt {
-			return nil
-		}
+	if slices.Contains(allowedExts, ext) {
+		return nil
 	}
 
 	log.Info(ctx, "invalid file extension", log.Metadata{

@@ -76,8 +76,8 @@ type dumpFeedEntry struct {
 // buildDumpOutput builds the output for the dump command.
 // If a feed has non-default options, it outputs the object format.
 // Otherwise, it outputs just the URL string.
-func buildDumpOutput(state *diff.State) map[string][]interface{} {
-	output := make(map[string][]interface{})
+func buildDumpOutput(state *diff.State) map[string][]any {
+	output := make(map[string][]any)
 
 	for category, feeds := range state.FeedsByCategoryTitle {
 		for _, feed := range feeds {

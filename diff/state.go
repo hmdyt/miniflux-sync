@@ -1,5 +1,7 @@
 package diff
 
+import "slices"
+
 // State represents either the current remote state of Miniflux, or the intended local state of
 // Miniflux.
 type State struct {
@@ -36,13 +38,7 @@ func (s State) FeedExists(feedURL string, categoryTitle string) bool {
 		return false
 	}
 
-	for _, url := range feedURLs {
-		if url == feedURL {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(feedURLs, feedURL)
 }
 
 // FeedURLs returns a list of all feed URLs in the state.

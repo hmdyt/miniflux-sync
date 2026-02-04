@@ -10,7 +10,7 @@ import (
 )
 
 // Metadata is a map of string to any, which is used to add metadata fields to a log event.
-type Metadata map[string]interface{}
+type Metadata map[string]any
 
 // New returns a new zerolog.Logger, using a ConsoleWriter.
 func New() zerolog.Logger {
@@ -19,7 +19,7 @@ func New() zerolog.Logger {
 		TimeFormat: "2006-01-02T15:04:05.0000",
 	}
 
-	writer.FormatTimestamp = func(i interface{}) string {
+	writer.FormatTimestamp = func(i any) string {
 		return time.Now().Format(writer.TimeFormat)
 	}
 
@@ -106,8 +106,8 @@ func getLogger(ctx context.Context) *zerolog.Logger {
 	return logger
 }
 
-func mergeMetadata(meta ...Metadata) map[string]interface{} {
-	merged := map[string]interface{}{}
+func mergeMetadata(meta ...Metadata) map[string]any {
+	merged := map[string]any{}
 
 	for _, m := range meta {
 		for k, v := range m {

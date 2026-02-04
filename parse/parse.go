@@ -17,7 +17,7 @@ type feedEntry struct {
 }
 
 // UnmarshalYAML implements custom unmarshaling for mixed format support.
-func (f *feedEntry) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (f *feedEntry) UnmarshalYAML(unmarshal func(any) error) error {
 	// Try as string first (simple URL format)
 	var urlString string
 	if err := unmarshal(&urlString); err == nil {
