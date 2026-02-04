@@ -1,6 +1,9 @@
 Blog:
   - https://brandur.org/articles.atom
   - https://matt-rickard.com/rss
+  - url: https://example.com/feed.xml
+    crawler: true
+    scraper_rules: "article"
 HN:
   - https://hnrss.org/frontpage?points=200
 YouTube:
@@ -8,3 +11,8 @@ YouTube:
   - https://www.youtube.com/feeds/videos.xml?channel_id=UCm325cMiw9B15xl22_gr6Dw # Beau Miles
   - https://www.youtube.com/feeds/videos.xml?channel_id=UCpnuadQ_w3r6f4Q_NRlqd-w # Kraig Adams
   - https://www.youtube.com/feeds/videos.xml?channel_id=UCSYG0DaTjEpo9LlE-f_1L1g # Kevin Rose
+Private:
+  - url: https://private.example.com/feed.xml
+    username: user
+    password: secret
+    user_agent: "Custom User Agent"

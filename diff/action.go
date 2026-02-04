@@ -10,6 +10,9 @@ const (
 	// CreateFeed represents an action to create a feed.
 	CreateFeed ActionType = "CreateFeed"
 
+	// UpdateFeed represents an action to update a feed's options.
+	UpdateFeed ActionType = "UpdateFeed"
+
 	// DeleteCategory represents an action to delete a category.
 	DeleteCategory ActionType = "DeleteCategory"
 
@@ -22,4 +25,5 @@ type Action struct {
 	Type          ActionType
 	CategoryTitle string
 	FeedURL       string
+	FeedOptions   FeedOptions
 }

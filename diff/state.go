@@ -4,6 +4,7 @@ package diff
 // Miniflux.
 type State struct {
 	FeedURLsByCategoryTitle map[string][]string
+	FeedsByCategoryTitle    map[string][]Feed
 }
 
 // CategoryExists checks if a category exists in the state.
@@ -53,4 +54,35 @@ func (s State) FeedURLs() []string {
 	}
 
 	return feedURLs
+}
+
+// GetFeedOptions returns the options for a specific feed URL, or empty options if not found.
+func (s State) GetFeedOptions(feedURL string) FeedOptions {
+	for _, feeds := range s.FeedsByCategoryTitle {
+		for _, feed := range feeds {
+			if feed.URL == feedURL {
+				return feed.Options
+			}
+		}
+	}
+	return FeedOptions{}
+}
+
+// GetFeedsByCategory returns the feeds by category.
+// If FeedsByCategoryTitle is not set, it falls back to FeedURLsByCategoryTitle.
+func (s State) GetFeedsByCategory() map[string][]Feed {
+	if len(s.FeedsByCategoryTitle) > 0 {
+		return s.FeedsByCategoryTitle
+	}
+
+	// Fallback to FeedURLsByCategoryTitle for backward compatibility.
+	result := make(map[string][]Feed)
+	for categoryTitle, feedURLs := range s.FeedURLsByCategoryTitle {
+		feeds := make([]Feed, 0, len(feedURLs))
+		for _, url := range feedURLs {
+			feeds = append(feeds, Feed{URL: url})
+		}
+		result[categoryTitle] = feeds
+	}
+	return result
 }

@@ -49,6 +49,8 @@ func Update( //nolint:cyclop,funlen
 				CategoryID: categoryID,
 			}
 
+			applyOptionsToCreationRequest(&req, action.FeedOptions)
+
 			feedID, err := client.CreateFeed(&req)
 			if err != nil {
 				return errors.Wrap(err, "creating feed")
@@ -60,6 +62,25 @@ func Update( //nolint:cyclop,funlen
 			}
 
 			feeds = append(feeds, feed)
+
+		case diff.UpdateFeed:
+			log.Info(ctx, "updating feed", log.Metadata{
+				"category": action.CategoryTitle,
+				"url":      action.FeedURL,
+			})
+
+			feedID, err := findFeedIDByURL(action.FeedURL, feeds)
+			if err != nil {
+				return errors.Wrap(err, "finding feed id")
+			}
+
+			modReq := miniflux.FeedModificationRequest{}
+			applyOptionsToModificationRequest(&modReq, action.FeedOptions)
+
+			_, err = client.UpdateFeed(feedID, &modReq)
+			if err != nil {
+				return errors.Wrap(err, "updating feed")
+			}
 
 		case diff.DeleteCategory:
 			log.Info(ctx, "deleting category", log.Metadata{
@@ -140,4 +161,72 @@ func removeFeedByID(id int64, feeds []*miniflux.Feed) []*miniflux.Feed {
 	}
 
 	return feeds
+}
+
+// applyOptionsToCreationRequest applies feed options to a FeedCreationRequest.
+func applyOptionsToCreationRequest(req *miniflux.FeedCreationRequest, opts diff.FeedOptions) {
+	if opts.Crawler != nil {
+		req.Crawler = *opts.Crawler
+	}
+	if opts.Username != nil {
+		req.Username = *opts.Username
+	}
+	if opts.Password != nil {
+		req.Password = *opts.Password
+	}
+	if opts.UserAgent != nil {
+		req.UserAgent = *opts.UserAgent
+	}
+	if opts.Cookie != nil {
+		req.Cookie = *opts.Cookie
+	}
+	if opts.Disabled != nil {
+		req.Disabled = *opts.Disabled
+	}
+	if opts.IgnoreHTTPCache != nil {
+		req.IgnoreHTTPCache = *opts.IgnoreHTTPCache
+	}
+	if opts.FetchViaProxy != nil {
+		req.FetchViaProxy = *opts.FetchViaProxy
+	}
+	if opts.AllowSelfSignedCertificates != nil {
+		req.AllowSelfSignedCertificates = *opts.AllowSelfSignedCertificates
+	}
+	if opts.DisableHTTP2 != nil {
+		req.DisableHTTP2 = *opts.DisableHTTP2
+	}
+	if opts.ScraperRules != nil {
+		req.ScraperRules = *opts.ScraperRules
+	}
+	if opts.RewriteRules != nil {
+		req.RewriteRules = *opts.RewriteRules
+	}
+	if opts.BlocklistRules != nil {
+		req.BlocklistRules = *opts.BlocklistRules
+	}
+	if opts.KeeplistRules != nil {
+		req.KeeplistRules = *opts.KeeplistRules
+	}
+	if opts.HideGlobally != nil {
+		req.HideGlobally = *opts.HideGlobally
+	}
+}
+
+// applyOptionsToModificationRequest applies feed options to a FeedModificationRequest.
+func applyOptionsToModificationRequest(req *miniflux.FeedModificationRequest, opts diff.FeedOptions) {
+	req.Crawler = opts.Crawler
+	req.Username = opts.Username
+	req.Password = opts.Password
+	req.UserAgent = opts.UserAgent
+	req.Cookie = opts.Cookie
+	req.Disabled = opts.Disabled
+	req.IgnoreHTTPCache = opts.IgnoreHTTPCache
+	req.FetchViaProxy = opts.FetchViaProxy
+	req.AllowSelfSignedCertificates = opts.AllowSelfSignedCertificates
+	req.DisableHTTP2 = opts.DisableHTTP2
+	req.ScraperRules = opts.ScraperRules
+	req.RewriteRules = opts.RewriteRules
+	req.BlocklistRules = opts.BlocklistRules
+	req.KeeplistRules = opts.KeeplistRules
+	req.HideGlobally = opts.HideGlobally
 }

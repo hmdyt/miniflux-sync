@@ -41,14 +41,32 @@ func CalculateDiff(local *State, remote *State) ([]Action, error) { //nolint:cyc
 	}
 
 	// Iterate over local feeds and check if they exist in the remote feeds.
-	for categoryTitle, feedURLs := range local.FeedURLsByCategoryTitle {
-		for _, feedURL := range feedURLs {
-			if !remote.FeedExists(feedURL, categoryTitle) {
+	for categoryTitle, feeds := range local.GetFeedsByCategory() {
+		for _, feed := range feeds {
+			if !remote.FeedExists(feed.URL, categoryTitle) {
 				actions = append(actions, Action{
 					Type:          CreateFeed,
 					CategoryTitle: categoryTitle,
-					FeedURL:       feedURL,
+					FeedURL:       feed.URL,
+					FeedOptions:   feed.Options,
 				})
+			}
+		}
+	}
+
+	// Check for feed option updates (both feeds exist, but options differ).
+	for categoryTitle, feeds := range local.GetFeedsByCategory() {
+		for _, localFeed := range feeds {
+			if remote.FeedExists(localFeed.URL, categoryTitle) {
+				remoteOptions := remote.GetFeedOptions(localFeed.URL)
+				if needsUpdate(localFeed.Options, remoteOptions) {
+					actions = append(actions, Action{
+						Type:          UpdateFeed,
+						CategoryTitle: categoryTitle,
+						FeedURL:       localFeed.URL,
+						FeedOptions:   localFeed.Options,
+					})
+				}
 			}
 		}
 	}
@@ -56,4 +74,12 @@ func CalculateDiff(local *State, remote *State) ([]Action, error) { //nolint:cyc
 	sort.Sort(ActionSorter(actions))
 
 	return actions, nil
+}
+
+// needsUpdate checks if local options differ from remote and require an update.
+func needsUpdate(local, remote FeedOptions) bool {
+	if local.IsEmpty() {
+		return false // No options specified locally, no update needed.
+	}
+	return !local.Equal(remote)
 }

@@ -21,6 +21,7 @@ func (a ActionSorter) Less(i int, j int) bool { //nolint:varnamelen
 		DeleteCategory: 1,
 		CreateCategory: 2,
 		CreateFeed:     3,
+		UpdateFeed:     4,
 	}
 
 	// First, sort by action type.
@@ -40,6 +41,9 @@ func (a ActionSorter) Less(i int, j int) bool { //nolint:varnamelen
 		return a[i].CategoryTitle < a[j].CategoryTitle
 
 	case CreateFeed:
+		return a[i].FeedURL < a[j].FeedURL
+
+	case UpdateFeed:
 		return a[i].FeedURL < a[j].FeedURL
 
 	default:
